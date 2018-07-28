@@ -1,0 +1,79 @@
+{
+	"interactionModel": {
+		"languageModel": {
+			"invocationName": "une aventure",
+			"intents": [
+				{
+					"name": "AMAZON.CancelIntent",
+					"samples": []
+				},
+				{
+					"name": "AMAZON.HelpIntent",
+					"samples": []
+				},
+				{
+					"name": "AMAZON.PauseIntent",
+					"samples": []
+				},
+				{
+					"name": "AMAZON.StartOverIntent",
+					"samples": []
+				},
+				{
+					"name": "AMAZON.StopIntent",
+					"samples": []
+				},
+				{
+					"name": "StartAdventureIntent",
+					"slots": [],
+					"samples": [
+						"commence une aventure"
+					]
+				},
+				{
+					"name": "DirectionIntent",
+					"slots": [
+						{
+							"name": "direction",
+							"type": "DIRECTION"
+						}
+					],
+					"samples": [
+						"je vais {direction}"
+					]
+				}
+			],
+			"types": [
+				{
+					"name": "DIRECTION",
+					"values": [
+						{
+							"id": "right",
+							"name": {
+								"value": "a droite"
+							}
+						},
+						{
+							"id": "left",
+							"name": {
+								"value": "a gauche"
+							}
+						},
+						{
+							"id": "front",
+							"name": {
+								"value": "tout droit"
+							}
+						},
+						{
+							"id": "back",
+							"name": {
+								"value": "en arrière"
+							}
+						}
+					]
+				}
+			]
+		}
+	}
+}
