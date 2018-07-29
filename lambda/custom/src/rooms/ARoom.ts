@@ -24,8 +24,13 @@ export abstract class ARoom {
 
 	public getDirections(): string {
 		let description = texts.Direction;
-		description += this.roomNodes.slice(0, -1).map((node) => node.description).join(", ");
-		description += `ou ${this.roomNodes[this.roomNodes.length - 1].description}`;
+
+		if (this.roomNodes.length > 1) {
+			description += this.roomNodes.slice(0, -1).map((node) => node.description).join(", ");
+			description += ` ou ${this.roomNodes[this.roomNodes.length - 1].description}`;
+		} else {
+			description += ` ${this.roomNodes[0].description}`;
+		}
 		return description;
 	}
 
