@@ -7,6 +7,7 @@ export enum RoomType {
 }
 
 export interface IDirection {
+	direction: string;
 	description: string;
 	roomID: number;
 }
@@ -22,13 +23,23 @@ export abstract class ARoom {
 	public abstract getDescription(): string;
 
 	public getDirections(): string {
-		return [texts.Direction, ...this.roomNodes.map((node) => node.description)].join(" ");
+		let description = texts.Direction;
+		description += this.roomNodes.slice(0, -1).map((node) => node.description).join(", ");
+		description += `ou ${this.roomNodes[this.roomNodes.length - 1].description}`;
+		return description;
 	}
 
-	public setDirection(roomID: number, description: string): void {
+	public setDirection(roomID: number, direction: string, description: string): void {
 		this.roomNodes.push({
 			description,
+			direction,
 			roomID,
 		});
+	}
+
+	public resolveDirection(direction: string): number {
+		const selectedNode = this.roomNodes.find((node) => node.direction === direction);
+
+		return selectedNode && selectedNode.roomID || -1;
 	}
 }

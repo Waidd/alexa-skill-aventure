@@ -31,6 +31,19 @@ function getRoomDescription(attributesManager: Alexa.AttributesManager): string 
 	return `${description} ${directions}`;
 }
 
+function moveIntoNextRoom(attributesManager: Alexa.AttributesManager, direction: string): void {
+	const attributes = attributesManager.getSessionAttributes();
+
+	const room = world.getRoomByID(attributes.roomID);
+	const newRoomID = room.resolveDirection(direction);
+	logger.info("moveIntoNextRoom", room, direction, newRoomID);
+
+	if (newRoomID >= 0) {
+		attributes.roomID = newRoomID;
+		attributesManager.setSessionAttributes(attributes);
+	}
+}
+
 /* INTENT HANDLERS */
 const LaunchRequestHandler = {
 	canHandle(handlerInput: Alexa.HandlerInput): boolean {
@@ -126,11 +139,14 @@ const DirectionIntent = {
 		const attributes = handlerInput.attributesManager.getSessionAttributes();
 
 		return request.type === "IntentRequest" &&
-		(request.intent.name === "DirectionIntent" && attributes.state === "ASK_DIRECTION");
+			(request.intent.name === "DirectionIntent");
 	},
 	handle(handlerInput: Alexa.HandlerInput): Response {
 		logger.info("DirectionIntent", "handle");
-		logger.info(handlerInput.requestEnvelope.request.intent.slots);
+		logger.info("DirectionIntent", "slot", (handlerInput.requestEnvelope.request as any).intent.slots.direction.value);
+
+		const direction = (handlerInput.requestEnvelope.request as any).intent.slots.direction.value;
+		moveIntoNextRoom(handlerInput.attributesManager, direction);
 
 		const description = getRoomDescription(handlerInput.attributesManager);
 

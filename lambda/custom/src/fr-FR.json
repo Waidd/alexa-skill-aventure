@@ -4,7 +4,7 @@
 	"REPROMPT": "Voulez-vous vivre une autre aventure ?",
 	"EXIT": "A bientôt, pour une nouvelle aventure.",
 	"CROSSROAD": "Vous arrivez à une intersection et trois choix s'offrent à vous : Aller tout droit, à droite ou à gauche. Où allez-vous ?",
-	"Direction": "Vous pouvez allez",
+	"Direction": "Vous pouvez",
 	"RoomsDescription": {
 		"ForestEdge": "Vous vous trouvez à la lisière d'une forêt.",
 		"ForestCrossing": "Alors que vous suivez le sentier dans la forêt, vous arrivez à une intersection.",
