@@ -1,10 +1,10 @@
-import { ARoom } from "../rooms/ARoom";
+import { Room } from "../rooms/Room";
 
 export class Aventure {
 	public static createAventure(): Aventure {
 		return new Aventure();
 	}
 
-	private rooms: ARoom[] = new Array<ARoom>();
-	private currentRoom: ARoom = null;
+	private rooms: Room[] = new Array<Room>();
+	private currentRoom: Room = null;
 }
