@@ -39,7 +39,12 @@
 						}
 					],
 					"samples": [
-						"je vais {direction}"
+						"je suis {direction} ",
+						"j'entre dans {direction}",
+						"je marche vers {direction}",
+						"je vais à {direction}",
+						"je vais en direction de {direction}",
+						"je vais vers {direction}"
 					]
 				}
 			],
@@ -48,27 +53,26 @@
 					"name": "DIRECTION",
 					"values": [
 						{
-							"id": "right",
 							"name": {
-								"value": "a droite"
+								"value": "sentier",
+								"synonyms": [
+									"chemin"
+								]
 							}
 						},
 						{
-							"id": "left",
 							"name": {
-								"value": "a gauche"
+								"value": "lisière"
 							}
 						},
 						{
-							"id": "front",
 							"name": {
-								"value": "tout droit"
+								"value": "clairière"
 							}
 						},
 						{
-							"id": "back",
 							"name": {
-								"value": "en arrière"
+								"value": "forêt"
 							}
 						}
 					]
