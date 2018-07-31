@@ -1,27 +1,46 @@
 import {
-	ARoom,
-	ForestCrossing,
-	ForestEdge,
-	ForestGlade,
+	Room,
 	RoomType,
 } from "../rooms";
+
+import texts from "../fr-FR.json";
 
 export class World {
 	public static createWorld(): World {
 		return new World();
 	}
 
-	private rooms: ARoom[] = new Array<ARoom>();
+	private rooms: Room[] = new Array<Room>();
 
 	public constructor() {
-		this.rooms.push(new ForestEdge());
-		this.rooms.push(new ForestCrossing());
-		this.rooms.push(new ForestGlade());
+		this.rooms.push(new Room(RoomType.FOREST_EDGE, texts.RoomsDescription.ForestEdge));
+		this.rooms.push(new Room(RoomType.FOREST_CROSSING, texts.RoomsDescription.ForestCrossing));
+		this.rooms.push(new Room(RoomType.FOREST_GLADE, texts.RoomsDescription.ForestGlade));
 
-		this.rooms[0].setDirection(1, "tout droit", "aller tout droit, et vous engager sur un petit sentier");
-		this.rooms[1].setDirection(0, "en arrière", "retourner en arrière, vers la lisière de la forêt");
-		this.rooms[1].setDirection(2, "tout droit", "continuer tout droit en suivant le chemin");
-		this.rooms[2].setDirection(1, "en arrière", "retourner en arrière par le sentier que vous avez emprunter");
+		this.rooms[0].setDirection(
+			1,
+			"sentier",
+			"vous engager sur le petit sentier qui s'enfonce dans la forêt",
+			"retourner sur le sentier qui s'enfonce dans la forêt",
+		);
+		this.rooms[1].setDirection(
+			0,
+			"lisière",
+			"vous diriger vers la lisière de la forêt",
+			"retourner vers la lisière de la forêt",
+		);
+		this.rooms[1].setDirection(
+			2,
+			"sentier",
+			"suivre le chemin qui s'enfonce dans la forêt",
+			"retourner sur le chemin qui s'enfonce dans la forêt",
+		);
+		this.rooms[2].setDirection(
+			1,
+			"sentier",
+			"suivre le sentier qui s'enfonce dans la forêt",
+			"retourner sur le sentier qui s'enfonce dans la forêt",
+		);
 	}
 
 	public getRoomDescription(roomID: number): string {
@@ -29,12 +48,12 @@ export class World {
 		return room.getDescription();
 	}
 
-	public getRoomDirections(roomID: number): string {
+	public getRoomDirections(roomID: number, fromRoomID: number): string {
 		const room = this.rooms[roomID];
-		return room.getDirections();
+		return room.getDirections(fromRoomID);
 	}
 
-	public getRoomByID(roomID: number): ARoom {
+	public getRoomByID(roomID: number): Room {
 		return this.rooms[roomID];
 	}
 }

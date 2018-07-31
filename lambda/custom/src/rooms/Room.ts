@@ -29,16 +29,21 @@ export class Room {
 		return this.description;
 	}
 
-	public getDirections(): string {
-		let description = texts.Direction;
+	public getDirections(fromRoomID: number): string {
+		const directions = new Array<string>();
+		this.roomNodes.forEach((node) => {
+			if (node.roomID === fromRoomID) {
+				directions.unshift(node.descriptionReturn);
+			} else {
+				directions.push(node.description);
+			}
+		});
 
-		if (this.roomNodes.length > 1) {
-			description += ` ${this.roomNodes.slice(0, -1).map((node) => node.description).join(", ")}`;
-			description += ` ou ${this.roomNodes[this.roomNodes.length - 1].description}`;
+		if (directions.length > 1) {
+			return `${texts.Direction} ${directions.slice(0, -1).join(", ")}`;
 		} else {
-			description += ` ${this.roomNodes[0].description}`;
+			return `${texts.Direction} ${directions[0]}`;
 		}
-		return description;
 	}
 
 	public setDirection(roomID: number, direction: string, description: string, descriptionReturn: string): void {

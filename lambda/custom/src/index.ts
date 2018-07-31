@@ -18,15 +18,16 @@ function startAventure(attributesManager: Alexa.AttributesManager): void {
 	const attributes = attributesManager.getSessionAttributes();
 
 	attributes.roomID = 0;
+	attributes.fromRoomID = -1;
 
 	attributesManager.setSessionAttributes(attributes);
 }
 
 function getRoomDescription(attributesManager: Alexa.AttributesManager): string {
-	const { roomID } = attributesManager.getSessionAttributes();
+	const { roomID, fromRoomID } = attributesManager.getSessionAttributes();
 
 	const description = world.getRoomDescription(roomID);
-	const directions = world.getRoomDirections(roomID);
+	const directions = world.getRoomDirections(roomID, fromRoomID);
 
 	return `${description} ${directions}`;
 }
