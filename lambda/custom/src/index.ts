@@ -34,13 +34,15 @@ function getRoomDescription(attributesManager: Alexa.AttributesManager): string 
 
 function moveIntoNextRoom(attributesManager: Alexa.AttributesManager, direction: string): void {
 	const attributes = attributesManager.getSessionAttributes();
+	const { roomID } = attributes;
 
-	const room = world.getRoomByID(attributes.roomID);
+	const room = world.getRoomByID(roomID);
 	const newRoomID = room.resolveDirection(direction);
-	logger.info("moveIntoNextRoom", room, direction, newRoomID);
+	logger.info("moveIntoNextRoom", room, direction, `from ${roomID} to ${newRoomID}`);
 
 	if (newRoomID >= 0) {
 		attributes.roomID = newRoomID;
+		attributes.fromRoomID = roomID;
 		attributesManager.setSessionAttributes(attributes);
 	}
 }

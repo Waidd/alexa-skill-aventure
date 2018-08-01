@@ -40,7 +40,7 @@ export class Room {
 		});
 
 		if (directions.length > 1) {
-			return `${texts.Direction} ${directions.slice(0, -1).join(", ")}`;
+			return `${texts.Direction} ${directions.slice(0, -1).join(", ")} ou ${directions[directions.length - 1]}`;
 		} else {
 			return `${texts.Direction} ${directions[0]}`;
 		}
