@@ -33,16 +33,16 @@ export class Room {
 		const directions = new Array<string>();
 		this.roomNodes.forEach((node) => {
 			if (node.roomID === fromRoomID) {
-				directions.unshift(node.descriptionReturn);
+				directions.push(node.descriptionReturn);
 			} else {
-				directions.push(node.description);
+				directions.unshift(node.description);
 			}
 		});
 
 		if (directions.length > 1) {
-			return `${texts.Direction} ${directions.slice(0, -1).join(", ")} ou ${directions[directions.length - 1]}`;
+			return `${texts.Direction} : ${directions.slice(0, -1).join(", ")}, ou retourner en arrière, ${directions[directions.length - 1]}`;
 		} else {
-			return `${texts.Direction} ${directions[0]}`;
+			return `${texts.Direction} : ${directions[0]}`;
 		}
 	}
 
