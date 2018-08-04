@@ -4,12 +4,17 @@
 		"lib": ["es2017"],
 		"module": "commonjs",
 		"noImplicitAny": true,
-		"outDir": ".build",
+		"outDir": "dist-test",
 		"preserveConstEnums": true,
+		"removeComments": true,
 		"resolveJsonModule": true,
 		"target": "es2017"
 	},
+	"include": [
+		"src/**/*"
+	],
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		"*.spec.ts"
 	]
 }

@@ -1,40 +1,189 @@
-export enum SquareDirection {
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST,
+export enum Direction {
+	NORTH,
+	SOUTH,
+	EAST,
+	WEST,
 }
 
-export enum SquareType {
-    FOREST,
-    PLAIN,
+export const DirectionToString: { [id: string]: string } = {
+	[Direction.NORTH]: "le nord",
+	[Direction.SOUTH]: "le sud",
+	[Direction.EAST]: "l'est",
+	[Direction.WEST]: "l'ouest",
+};
+
+export enum Type {
+	FOREST,
+	PLAIN,
 }
+
+export const DirectionsPattern: { [id: string]: string } = {
+	[`${Type.FOREST}-${Type.FOREST}`]: "dans la forêt",
+	[`${Type.FOREST}-${Type.PLAIN}`]: "en dehors de la forêt",
+	[`${Type.PLAIN}-${Type.PLAIN}`]: "dans la plaine",
+	[`${Type.PLAIN}-${Type.FOREST}`]: "au sein de la forêt",
+};
 
 export enum SquareParticularity {
-    GLADE,
+	GLADE,
 }
 
 export class Square {
-    public type: SquareType;
-    public particulariy: SquareParticularity;
-    public roadsTo: SquareDirection[] = new Array<SquareDirection>();
-    
-    public constructor(
-        type: SquareType,
-        particulariy: SquareParticularity,
-        roadsTo: SquareDirection[],
-    ) {
-        this.type = type;
-        this.particulariy = particulariy;
-        this.roadsTo.add(...roadsTo);
-    }
-    
-    public get directions(from: Square) {
-        // from sentence
-        // type of from
-        // type of here
-        // is there road ?
-    }
+	public static getOppositeDirection(from: Direction): Direction {
+		switch (from) {
+			case Direction.NORTH: {
+				return Direction.SOUTH;
+			}
+			case Direction.SOUTH: {
+				return Direction.NORTH;
+			}
+			case Direction.EAST: {
+				return Direction.WEST;
+			}
+			case Direction.WEST: {
+				return Direction.EAST;
+			}
+		}
+	}
+
+	public x: number;
+	public y: number;
+
+	public type: Type;
+	public particulariy: SquareParticularity;
+	public roadsTo: Direction[] = new Array<Direction>();
+
+	public constructor(
+		x: number,
+		y: number,
+		type: Type,
+		particulariy: SquareParticularity = null,
+		roadsTo: Direction[] = [],
+	) {
+		this.x = x;
+		this.y = y;
+		this.type = type;
+		this.particulariy = particulariy;
+		this.roadsTo.push(...roadsTo);
+	}
+
+	public getText(from: Square): string {
+		return `${this.getDirections(from)} ${this.getDirections2(from)}`;
+	}
+
+	public getDirections(from: Square): string {
+		let text = "";
+
+		const directionFrom = this.getDirectionToSquare(from);
+		if (this.roadsTo.includes(directionFrom)) {
+			// come from a road
+			// @TODO could replace "suivez" with variations of the word
+			text += "Vous suivez le chemin";
+		} else {
+			// does not come from a road
+			const toRoughTerrain = this.isRoughTerrain;
+			const fromRoughTerrain = from.isRoughTerrain;
+
+			if (fromRoughTerrain && toRoughTerrain) {
+				text += "Vous progressez péniblement";
+			} else if (!fromRoughTerrain && !toRoughTerrain) {
+				text += "Vous progressez";
+			} else {
+				text += "Vous vous frayez un chemin";
+			}
+		}
+
+		text += ` ${DirectionsPattern[`${from.type}-${this.type}`]}.`;
+
+		return text;
+	}
+
+	public getDirections2(from: Square): string {
+		let text = "";
+
+		const directionFrom = this.getDirectionToSquare(from);
+		if (this.roadsTo.includes(directionFrom)) {
+			switch (this.roadsTo.length) {
+				case 1: {
+					text += "La route se termine ici.";
+					break;
+				}
+				case 2: {
+					const oppositeDirection = Square.getOppositeDirection(directionFrom);
+					if (this.roadsTo.includes(oppositeDirection)) {
+						text += `La route continue vers ${DirectionToString[oppositeDirection]}.`;
+					} else {
+						const directionTo = this.roadsTo.filter((each) => each !== directionFrom)[0];
+						text += `La route bifurque vers ${DirectionToString[directionTo]}.`;
+					}
+					break;
+				}
+				case 3: {
+					text += "La route se sépare en deux.";
+					break;
+				}
+				case 4: {
+					text += "La route se sépare en trois.";
+					break;
+				}
+			}
+		} else {
+			const hasRoads = this.hasRoads;
+			if (hasRoads) {
+				switch (this.roadsTo.length) {
+					case 1: {
+						text += `Ici, une route commence et mène vers ${DirectionToString[this.roadsTo[0]]}.`;
+						break;
+					}
+					case 2: {
+						text += "Vous tombez sur une route qui joint ";
+						text += `${DirectionToString[this.roadsTo[0]]} à ${DirectionToString[this.roadsTo[1]]}.`;
+						break;
+					}
+					case 3: {
+						text += "Vous tombez sur un croisement.";
+						break;
+					}
+					default: {
+						// should not happen
+						break;
+					}
+				}
+			} else {
+				text += "Ici, il n'y a rien de spécial.";
+			}
+		}
+
+		return text;
+	}
+
+	public get isRoughTerrain(): boolean {
+		switch (this.type) {
+			case Type.FOREST: {
+				return true;
+			}
+			default: {
+				return false;
+			}
+		}
+	}
+
+	public get hasRoads(): boolean {
+		return this.roadsTo.length > 0;
+	}
+
+	private getDirectionToSquare(to: Square): Direction {
+		if (this.x > to.x) {
+			return Direction.WEST;
+		}
+		if (this.x < to.x) {
+			return Direction.EAST;
+		}
+		if (this.y > to.y) {
+			return Direction.SOUTH;
+		}
+		return Direction.NORTH;
+	}
 }
 
 // from sentence
@@ -47,5 +196,5 @@ export class Square {
 
 // Alors que vous suivez le chemin dans la forêt, celui-ci bifurque vers l'est.
 // Vous pouvez continuer de le suivre, ou retourner sur vos pas, au sud.
-// Vous pouvez également tenter votre chance en quittant le chemin et en 
+// Vous pouvez également tenter votre chance en quittant le chemin et en
 // vous engageant dans la forêt : au nord ou à l'ouest.

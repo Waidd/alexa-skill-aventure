@@ -1,4 +1,5 @@
 .ask
 node_modules
 dist
+dist-test
 .build
