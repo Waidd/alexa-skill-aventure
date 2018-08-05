@@ -5,6 +5,15 @@ export enum Direction {
 	WEST,
 }
 
+export enum Type {
+	FOREST,
+	PLAIN,
+}
+
+export enum SquareParticularity {
+	GLADE,
+}
+
 export interface INeighboor {
 	square: Square;
 	direction: Direction;
@@ -17,21 +26,12 @@ export const DirectionToString: { [id: string]: { formA: string, formB: string} 
 	[Direction.WEST]: { formA: "à l'ouest", formB: "l'ouest" },
 };
 
-export enum Type {
-	FOREST,
-	PLAIN,
-}
-
 export const DirectionsPattern: { [id: string]: string } = {
 	[`${Type.FOREST}-${Type.FOREST}`]: "dans la forêt",
 	[`${Type.FOREST}-${Type.PLAIN}`]: "en dehors de la forêt",
 	[`${Type.PLAIN}-${Type.PLAIN}`]: "dans la plaine",
-	[`${Type.PLAIN}-${Type.FOREST}`]: "au sein de la forêt",
+	[`${Type.PLAIN}-${Type.FOREST}`]: "qui entre dans la forêt",
 };
-
-export enum SquareParticularity {
-	GLADE,
-}
 
 export class Square {
 	public static getOppositeDirection(from: Direction): Direction {
@@ -80,7 +80,7 @@ export class Square {
 	}
 
 	public getText(from: Square): string {
-		return `${this.getProgression(from)} ${this.getDescription(from)}`;
+		return `${this.getProgression(from)} ${this.preDescription(from)} ${this.getDescription(from)}`;
 	}
 
 	public getProgression(from: Square): string {
@@ -110,6 +110,58 @@ export class Square {
 		return text;
 	}
 
+	public preDescription(from: Square): string {
+		const neighbourhood = this.neighbourhood.filter((neighbour) => neighbour.square !== from);
+		const typesDirections = new Array<{ type: Type, directions: Direction[] }>();
+		neighbourhood.forEach((neighbour) => {
+			const matching = typesDirections.find((typeDirections) => typeDirections.type === neighbour.square.type);
+			if (matching !== undefined) {
+				matching.directions.push(neighbour.direction);
+			} else {
+				typesDirections.push({
+					directions: [neighbour.direction],
+					type: neighbour.square.type,
+				});
+			}
+		});
+
+		const texts = new Array<string>();
+		typesDirections.forEach((typeDirections) => {
+			let text = "";
+			switch (typeDirections.type) {
+				case Type.PLAIN: {
+					text = typeDirections.type === this.type ? "La" : "Une";
+					text += " plaine";
+					break;
+				}
+				case Type.FOREST: {
+					text += typeDirections.type === this.type ? "La" : "Une";
+					text += " forêt";
+					break;
+				}
+				default: {
+					break;
+				}
+			}
+
+			if (typeDirections.type === this.type) {
+				text += " s'étend ";
+			} else {
+				text += " est visible ";
+			}
+
+			if (typeDirections.directions.length === 3) {
+				text += "dans toutes les directions";
+			} else {
+				text += typeDirections.directions.map((direction) => DirectionToString[direction].formA).join(" et ");
+			}
+
+			texts.push(`${text}.`);
+		});
+
+		return texts.join(" ");
+	}
+
 	public getDescription(from: Square): string {
 		let text = "";
 
@@ -117,7 +169,7 @@ export class Square {
 		if (this.roadsTo.includes(directionFrom)) {
 			switch (this.roadsTo.length) {
 				case 1: {
-					text += "La route se termine ici.";
+					text += "Ici la route se termine.";
 					break;
 				}
 				case 2: {
@@ -126,16 +178,16 @@ export class Square {
 						text += `La route continue ${DirectionToString[oppositeDirection].formA}.`;
 					} else {
 						const directionTo = this.roadsTo.filter((each) => each !== directionFrom)[0];
-						text += `La route bifurque ${DirectionToString[directionTo].formA}.`;
+						text += `Ici la route bifurque ${DirectionToString[directionTo].formA}.`;
 					}
 					break;
 				}
 				case 3: {
-					text += "La route se sépare en deux.";
+					text += "Ici la route se sépare en deux.";
 					break;
 				}
 				case 4: {
-					text += "La route se sépare en trois.";
+					text += "Ici la route se sépare en trois.";
 					break;
 				}
 			}
@@ -144,16 +196,16 @@ export class Square {
 			if (hasRoads) {
 				switch (this.roadsTo.length) {
 					case 1: {
-						text += `Ici, une route commence et mène ${DirectionToString[this.roadsTo[0]].formA}.`;
+						text += `Ici une route commence et mène ${DirectionToString[this.roadsTo[0]].formA}.`;
 						break;
 					}
 					case 2: {
-						text += "Vous tombez sur une route qui joint ";
+						text += "Ici il y a une route qui joint ";
 						text += `${DirectionToString[this.roadsTo[0]].formB} ${DirectionToString[this.roadsTo[1]].formA}.`;
 						break;
 					}
 					case 3: {
-						text += "Vous tombez sur un croisement.";
+						text += "Ici il y a un croisement.";
 						break;
 					}
 					default: {
@@ -162,7 +214,7 @@ export class Square {
 					}
 				}
 			} else {
-				text += "Ici, il n'y a rien de spécial.";
+				text += "Il n'y a rien de spécial ici.";
 			}
 		}
 
@@ -189,16 +241,3 @@ export class Square {
 		return neighbour.direction;
 	}
 }
-
-// from sentence
-// Vous suivez le chemin qui s'enfonce dans la forêt,
-// Vous suivez le chemin dans la forêt,
-// Vous suivez le chemin qui sort de la forêt,
-
-// Alors que vous avancer tant bien que mal au travers de la forêt, vous arrivez sur un chemin
-// Vous vous enfoncez dans la forêt, et arrivez à avancer au travers la végétation dense.
-
-// Alors que vous suivez le chemin dans la forêt, celui-ci bifurque vers l'est.
-// Vous pouvez continuer de le suivre, ou retourner sur vos pas, au sud.
-// Vous pouvez également tenter votre chance en quittant le chemin et en
-// vous engageant dans la forêt : au nord ou à l'ouest.

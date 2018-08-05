@@ -1,6 +1,6 @@
 import { Direction, Square, Type } from "./square";
 
-function case1(): string {
+function case1(): void {
 	const x0y1 = new Square(0, 1, Type.FOREST);
 	const x1y1 = new Square(1, 1, Type.FOREST);
 	const x1y0 = new Square(1, 0, Type.FOREST);
@@ -17,10 +17,13 @@ function case1(): string {
 		Direction.SOUTH,
 	]);
 
-	return x1y1.getText(x1y0);
+	console.log(x1y1.getText(x1y0));
+	console.log(x1y1.getText(x0y1));
+	console.log(x1y1.getText(x1y2));
+	console.log(x1y1.getText(x2y1));
 }
 
-console.log(case1());
+case1();
 
 // function case2(): string {
 // 	const s1 = new Square(0, 0, Type.FOREST);
