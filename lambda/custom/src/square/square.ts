@@ -5,11 +5,16 @@ export enum Direction {
 	WEST,
 }
 
-export const DirectionToString: { [id: string]: string } = {
-	[Direction.NORTH]: "le nord",
-	[Direction.SOUTH]: "le sud",
-	[Direction.EAST]: "l'est",
-	[Direction.WEST]: "l'ouest",
+export interface INeighboor {
+	square: Square;
+	direction: Direction;
+}
+
+export const DirectionToString: { [id: string]: { formA: string, formB: string} } = {
+	[Direction.NORTH]: { formA: "au nord", formB: "le nord" },
+	[Direction.SOUTH]: { formA: "au sud", formB: "le sud" },
+	[Direction.EAST]: { formA: "à l'est", formB: "l'est" },
+	[Direction.WEST]: { formA: "à l'ouest", formB: "l'ouest" },
 };
 
 export enum Type {
@@ -51,27 +56,34 @@ export class Square {
 
 	public type: Type;
 	public particulariy: SquareParticularity;
-	public roadsTo: Direction[] = new Array<Direction>();
+	public neighbourhood: INeighboor[];
+	public roadsTo: Direction[];
 
 	public constructor(
 		x: number,
 		y: number,
 		type: Type,
 		particulariy: SquareParticularity = null,
-		roadsTo: Direction[] = [],
 	) {
 		this.x = x;
 		this.y = y;
 		this.type = type;
 		this.particulariy = particulariy;
-		this.roadsTo.push(...roadsTo);
+	}
+
+	public setNeighboorhood(
+		neighbourhood: INeighboor[],
+		roadsTo: Direction[] = [],
+	): void {
+		this.neighbourhood = neighbourhood;
+		this.roadsTo = roadsTo;
 	}
 
 	public getText(from: Square): string {
-		return `${this.getDirections(from)} ${this.getDirections2(from)}`;
+		return `${this.getProgression(from)} ${this.getDescription(from)}`;
 	}
 
-	public getDirections(from: Square): string {
+	public getProgression(from: Square): string {
 		let text = "";
 
 		const directionFrom = this.getDirectionToSquare(from);
@@ -98,7 +110,7 @@ export class Square {
 		return text;
 	}
 
-	public getDirections2(from: Square): string {
+	public getDescription(from: Square): string {
 		let text = "";
 
 		const directionFrom = this.getDirectionToSquare(from);
@@ -111,10 +123,10 @@ export class Square {
 				case 2: {
 					const oppositeDirection = Square.getOppositeDirection(directionFrom);
 					if (this.roadsTo.includes(oppositeDirection)) {
-						text += `La route continue vers ${DirectionToString[oppositeDirection]}.`;
+						text += `La route continue ${DirectionToString[oppositeDirection].formA}.`;
 					} else {
 						const directionTo = this.roadsTo.filter((each) => each !== directionFrom)[0];
-						text += `La route bifurque vers ${DirectionToString[directionTo]}.`;
+						text += `La route bifurque ${DirectionToString[directionTo].formA}.`;
 					}
 					break;
 				}
@@ -132,12 +144,12 @@ export class Square {
 			if (hasRoads) {
 				switch (this.roadsTo.length) {
 					case 1: {
-						text += `Ici, une route commence et mène vers ${DirectionToString[this.roadsTo[0]]}.`;
+						text += `Ici, une route commence et mène ${DirectionToString[this.roadsTo[0]].formA}.`;
 						break;
 					}
 					case 2: {
 						text += "Vous tombez sur une route qui joint ";
-						text += `${DirectionToString[this.roadsTo[0]]} à ${DirectionToString[this.roadsTo[1]]}.`;
+						text += `${DirectionToString[this.roadsTo[0]].formB} ${DirectionToString[this.roadsTo[1]].formA}.`;
 						break;
 					}
 					case 3: {
@@ -173,16 +185,8 @@ export class Square {
 	}
 
 	private getDirectionToSquare(to: Square): Direction {
-		if (this.x > to.x) {
-			return Direction.WEST;
-		}
-		if (this.x < to.x) {
-			return Direction.EAST;
-		}
-		if (this.y > to.y) {
-			return Direction.SOUTH;
-		}
-		return Direction.NORTH;
+		const neighbour = this.neighbourhood.find((each) => each.square === to);
+		return neighbour.direction;
 	}
 }
 
